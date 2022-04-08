@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  mysqldb:
+    image: mysql
+    container_name: mysql_covid
+    environment:
+      # je créer un utilisateur et un mdp
+      - MYSQL_ROOT_PASSWORD=root
+      # - MYSQL_USER=admin
+      # - MYSQL_PASSWORD=admin123
+      # - MYSQL_DATABASE=mysql_covid
+      - MYSQL_DATABASE=vaccinations
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./vaccination.sql:/docker-entrypoint-initdb.d/vaccination.sql
+    ports:
+      - "3306:3306"
+    restart: always
+    networks:
+      - mysql_network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GRAFANA_ADMIN_USER=admin
+      - GRAFANA_ADMIN_PASSWORD=admin
+    networks:
+      - mysql_network
+    volumes:
+      - grafana-storage:/var/lib/grafana
+volumes:
+  mysql-data:
+    name: mysql-data
+  grafana-storage:
+    name: grafana-storage
+networks:
+  mysql_network:
+    name: mysql_network
+
+#  adminer:
+#     image: adminer
+#     ports:
+#       - "8080:8080"
